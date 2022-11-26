@@ -26,9 +26,9 @@ class Racket(GameSprite):
         
     def move(self):
         keys = pygame.key.get_pressed()
-        if keys[self.keydown] == True:
+        if keys[self.keydown] == True and self.rect.y < window_h- 200:
             self.y += self.speed
-        if keys[self.keyup] == True:
+        if keys[self.keyup] == True and self.rect.y > 0:
             self.y -= self.speed
         self.rect.y = self.y
         
@@ -43,29 +43,30 @@ class Ball(GameSprite):
         self.x += self.speed*self.directX
         self.y += self.speed*self.directY
 
-        if self.rect.y >= window_h - 30:
+        if self.rect.y >= window_h - 50:
             self.directY = -1
         elif self.rect.y <= 0:
             self.directY = 1
 
-        if self.rect.x >= window_w - 30:
-            self.directX = -1
+        if self.rect.x >= window_w - 0:
+            window.blit(text, (310,285))
         elif self.rect.x<= 0:
-            self.directX = 1
+            window.blit(text, (310,285))
 
         self.rect.x = self.x
         self.rect.y = self.y
 
+    def colid_result(self):
+        self.directX *= -1
 
-
-
-font = pygame.font.Font(None, 70)
 PATH= os.path.dirname(__file__) + os.sep
+font = pygame.font.Font(PATH+'Roboto-Bold.ttf', 120)
 window_w = 1280
 window_h = 720
 window = pygame.display.set_mode((window_w, window_h))
 tik = pygame.time.Clock()
 game = True
+text = font.render("Проигрыш",1, (0,255,0))
 
 platform1 = Racket(PATH+'platform_placeholder.jpeg', 30, 200, 10, 10, 10, pygame.K_w, pygame.K_s)
 platform2 = Racket(PATH+'platform_placeholder.jpeg', 30, 200, window_w-40, window_h-210, 10, pygame.K_UP, pygame.K_DOWN)
@@ -86,6 +87,14 @@ while game:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game = False
+
+    if pygame.sprite.collide_rect(ball, platform1):
+        ball.colid_result()
+
+    if pygame.sprite.collide_rect(ball, platform2):
+        ball.colid_result()
+
+        
 
     tik.tick(30)
     pygame.display.update()
