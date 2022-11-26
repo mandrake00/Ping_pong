@@ -40,6 +40,8 @@ class Ball(GameSprite):
 
 
     def move(self):
+        global right_m
+        global left_m
         self.x += self.speed*self.directX
         self.y += self.speed*self.directY
 
@@ -48,10 +50,13 @@ class Ball(GameSprite):
         elif self.rect.y <= 0:
             self.directY = 1
 
-        if self.rect.x >= window_w - 0:
-            window.blit(text, (310,285))
-        elif self.rect.x<= 0:
-            window.blit(text, (310,285))
+        if self.rect.x >= window_w - 50:
+            self.directX = -1
+            right_m += 1
+
+        elif self.rect.x <= 0:
+            self.directX = 1
+            left_m += 1
 
         self.rect.x = self.x
         self.rect.y = self.y
@@ -66,20 +71,30 @@ window_h = 720
 window = pygame.display.set_mode((window_w, window_h))
 tik = pygame.time.Clock()
 game = True
-text = font.render("Проигрыш",1, (0,255,0))
+right_m = 0
+left_m = 0
 
-platform1 = Racket(PATH+'platform_placeholder.jpeg', 30, 200, 10, 10, 10, pygame.K_w, pygame.K_s)
-platform2 = Racket(PATH+'platform_placeholder.jpeg', 30, 200, window_w-40, window_h-210, 10, pygame.K_UP, pygame.K_DOWN)
-ball = Ball(PATH+"ball_placeholder.png", 50,50, 635, 300, 15)
+
+platform0 = Racket(PATH+'platform0.png', 30, 200, 10, 10, 10, pygame.K_w, pygame.K_s)
+platform1 = Racket(PATH+'platform1.png', 30, 200, window_w-40, window_h-210, 10, pygame.K_UP, pygame.K_DOWN)
+ball = Ball(PATH+"ball.png", 50,50, 635, 300, 7.5)
+background0 = GameSprite(PATH+'Background_2.png', window_w, window_h, 0, 0, 0)
+
 
 while game:
-    window.blit(pygame.transform.scale(pygame.image.load(PATH+'a.png'), (window_w, window_h)), (0,0))
+    background0.show()
+
+    text = font.render(str(int(right_m/3)),1, (0,0,0))
+    text1 = font.render(str(int(left_m/3)),1, (0,0,0))
+
+    window.blit(text, (100, 0))
+    window.blit(text1, (window_w-200, 0))
 
     platform1.move()
     platform1.show()
 
-    platform2.move()
-    platform2.show()
+    platform0.move()
+    platform0.show()
 
     ball.show()
     ball.move()
@@ -91,10 +106,8 @@ while game:
     if pygame.sprite.collide_rect(ball, platform1):
         ball.colid_result()
 
-    if pygame.sprite.collide_rect(ball, platform2):
+    if pygame.sprite.collide_rect(ball, platform0):
         ball.colid_result()
-
-        
 
     tik.tick(30)
     pygame.display.update()
