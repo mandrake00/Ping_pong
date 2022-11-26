@@ -84,8 +84,8 @@ background0 = GameSprite(PATH+'Background_2.png', window_w, window_h, 0, 0, 0)
 while game:
     background0.show()
 
-    text = font.render(str(int(right_m/3)),1, (0,0,0))
-    text1 = font.render(str(int(left_m/3)),1, (0,0,0))
+    text = font.render(str(int(right_m/3)),1, (179, 179, 0))
+    text1 = font.render(str(int(left_m/3)),1, (255, 51, 153))
 
     window.blit(text, (100, 0))
     window.blit(text1, (window_w-200, 0))
