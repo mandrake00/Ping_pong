@@ -23,6 +23,7 @@ class Racket(GameSprite):
         self.keydown = keydown
         
     def move(self):
+        global pause
         keys = pygame.key.get_pressed()
         if keys[self.keydown] == True and self.rect.y < window_h- 200:
             self.y += self.speed
@@ -30,6 +31,10 @@ class Racket(GameSprite):
             self.y -= self.speed
         self.rect.y = self.y
         
+        if keys[pygame.K_SPACE]:
+            pause *= -1
+        
+        return pause
 class Ball(GameSprite):
     def __init__(self, image, w,h, x,y, speed):
         super().__init__(image, w,h, x,y, speed)
@@ -38,7 +43,9 @@ class Ball(GameSprite):
 
     def move(self):
         global right_m
+        global pause
         global left_m
+
         self.x += self.speed*self.directX
         self.y += self.speed*self.directY
 
@@ -63,6 +70,7 @@ class Ball(GameSprite):
 
 PATH= os.path.dirname(__file__) + os.sep
 font = pygame.font.Font(PATH+'Roboto-Bold.ttf', 120)
+font1 = pygame.font.Font(PATH+'Roboto-Bold.ttf', 60)
 window_w = 1280
 window_h = 720
 window = pygame.display.set_mode((window_w, window_h))
@@ -71,29 +79,40 @@ game = True
 right_m = 0
 left_m = 0
 pygame.display.set_caption('Ping-Pong')
+pause = -1
+text2 = font1.render('Нажмите пробел для начала', 1, (0,0,0)) # type: ignore
+score_left = 0
+score_right = 0
 
 platform0 = Racket(PATH+'platform0.png', 30, 200, 10, 10, 10, pygame.K_w, pygame.K_s)
 platform1 = Racket(PATH+'platform1.png', 30, 200, window_w-40, window_h-210, 10, pygame.K_UP, pygame.K_DOWN)
 ball = Ball(PATH+"ball.png", 50,50, 635, 300, 7.5)
 background0 = GameSprite(PATH+'Background_2.png', window_w, window_h, 0, 0, 0)
+pause_menu = GameSprite(PATH+'a.png', window_w,window_h, 0, 0, 0)
 
 while game:
     background0.show()
 
-    text = font.render(str(int(right_m/3)),1, (179, 179, 0))
-    text1 = font.render(str(int(left_m/3)),1, (255, 51, 153))
+    text = font.render(str(int(right_m/3)),1, (179, 179, 0)) # type: ignore
+    text1 = font.render(str(int(left_m/3)),1, (255, 51, 153))  # type: ignore
 
     window.blit(text, (100, 0))
     window.blit(text1, (window_w-200, 0))
 
-    platform1.move()
-    platform1.show()
-
     platform0.move()
-    platform0.show()
+    platform1.move()
 
+    pause = platform1.move()
+
+    platform1.show()
+    platform0.show()
     ball.show()
-    ball.move()
+
+    if pause== 1:
+        ball.move()
+    else:
+        pause_menu.show()
+        window.blit(text2, (200, 620))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -101,9 +120,11 @@ while game:
 
     if pygame.sprite.collide_rect(ball, platform1):
         ball.colid_result()
+        score_right +=1
 
     if pygame.sprite.collide_rect(ball, platform0):
         ball.colid_result()
+        score_left += 1
 
     tik.tick(30)
     pygame.display.update()
